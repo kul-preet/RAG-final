@@ -1,0 +1,9 @@
+groq
+chromadb
+sentence-transformers
+pymupdf
+Pillow
+requests
+beautifulsoup4
+lxml
+python-dotenv
