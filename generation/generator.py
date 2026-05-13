@@ -17,9 +17,9 @@ def generate_answer(question,context):
     Question = {question}
     
     Answer """
-    response = client.chatcompletions.create(
+    response = client.chat.completions.create(
         model = config.GROQ_TEXT_MODEL,
-        message = [
+        messages = [
             {
                 "role" : "user",
                 "content" : prompt

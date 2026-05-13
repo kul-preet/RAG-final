@@ -15,13 +15,12 @@ from embeddings.embedder import embed_text, embed_many
 
 
 #step 1 :- create a client and fetch collections
-client = chromadb.persistantClient(path=config.CHROMA_DIR)
+client = chromadb.PersistentClient(path=config.CHROMA_DIR)
 collection = client.get_or_create_collection(
-    name = config.CHROMA_COLLECTION_NAME,
-    embedding_fnmetadata={"hnsw:space": "cosine"}
-    # "cosine" means: measure similarity using the angle between vectors
-    # (standard for text embeddings)
+    name=config.CHROMA_COLLECTION_NAME,
 )
+# "cosine" means: measure similarity using the angle between vectors
+# (standard for text embeddings)
 
 #--------------SAVING LOGIC----------------------
 def save_documents(documents):
@@ -51,31 +50,31 @@ def save_documents(documents):
     #need to conver the metadata to the string,bool, number
     clean_metadata = []
     for meta in metadatas:
-        clean = {}z
-        for key,value in meta.items():              # key="page", value=2
-            if value is none:                       # key="tags", value=["AI", "ML"]
+        clean = {}
+        for key, value in meta.items():              # key="page", value=2
+            if value is None:                       # key="tags", value=["AI", "ML"]
                 clean[key] = ""
-            elif isinstance(value, (list,dict)):
-                clean[key] = str(value)
+            elif isinstance(value, (str, bool, int, float)):
+                clean[key] = value
             else:
-                clean[key] = str[value]
+                clean[key] = str(value)
         clean_metadata.append(clean)
         
     
     ids = []
-    for _  in documents:            # 👉 _ means: "I don’t care about the variable, just repeat"
+    for _ in documents:            # 👉 _ means: "I don’t care about the variable, just repeat"
         ids.append(str(uuid.uuid4()))
-    #uuid created random id
+    # uuid created random id
     
-    print(f"Embedding {len(text)} chunks")
+    print(f"Embedding {len(texts)} chunks")
     embeddings = embed_many(texts)
     
     #save everyting to the chromadb
     collection.add(
-        ids = ids
-        embeddings = embeddings
+        ids = ids,
+        embeddings = embeddings,
         documents = texts,
-        metadatas = clean_metadata
+        metadatas = clean_metadata,
     )
     
     print(f"saved the {len(documents)} to the chromaDB")
@@ -92,16 +91,16 @@ def search(query, top_k = config.TOP_K):
     
     results = collection.query(
     #checking for the close matches in chromadb
-    query_embeddings = [query_vector], #wrapped in a list for multiple batches
-    n_results = min(top_k , collection.count()),  #min prevents for asking more results than existing
-    include = ["documents", "metadatas", "distan3ces"]
+    query_embeddings=[query_vector], #wrapped in a list for multiple batches
+    n_results=min(top_k, collection.count()),  #min prevents for asking more results than existing
+    include=["documents", "metadatas", "distances"]
     )
     
     output = []
     for text,meta,distance in zip(
-        results["documents"][0]
-        results["metadatas"][0]
-        results["distances"][0]
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0],
     ):
         # ChromaDB returns "distance" (lower = more similar)
         # We convert to "score" (higher = more similar) by: score = 1 - distance
