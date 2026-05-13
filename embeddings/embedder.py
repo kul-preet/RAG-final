@@ -8,10 +8,10 @@
 '''
 
 import config
-from sentence_transformers import sentenceTransformer
+from sentence_transformers import SentenceTransformer
 
 print ("Loading the embedding model")
-model = sentenceTransformer(config.EMBEDDING_MODEL)
+model = SentenceTransformer(config.EMBEDDING_MODEL)
 
 
 def embed_text (text):
@@ -36,6 +36,6 @@ def embed_many (texts):
     embeddings = model.encode(texts, show_progress_bar = True)
     result = []
     for emb in embeddings:
-        retult.append(emb.tolist())
+        result.append(emb.tolist())
         
     return result
