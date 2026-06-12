@@ -123,13 +123,16 @@ clear()   # wipes the database
 ## Project Structure
 
 ```
-├── ingest.py                  # Ingestion entry point
+├── app.py                     # Streamlit UI (entry point for web app)
+├── ingest.py                  # Ingestion entry point (CLI)
 ├── ask.py                     # Q&A entry point (interactive + single-query)
 ├── config.py                  # Configuration & environment
 ├── requirements.txt           # Dependencies
 ├── .env                       # API keys (not tracked)
-├── documents/                 # Place PDFs & images here
-├── chroma_db/                 # Persistent vector store (auto-created)
+├── .streamlit/
+│   └── config.toml            # Streamlit server settings
+├── documents/                 # Place PDFs, images & text files here
+├── chroma_db/                 # Persistent vector store (auto-created, gitignored)
 │
 ├── ingestion/
 │   ├── pdf_processor.py       # PDF text + embedded image extraction
@@ -163,6 +166,87 @@ clear()   # wipes the database
 | `lxml` | Fast HTML/XML parser for BeautifulSoup |
 | `python-dotenv` | `.env` file loading |
 
-## UI (Coming Soon)
+## Streamlit Web UI
 
-A Streamlit-based user interface is planned to provide a web GUI for document upload, URL ingestion, and interactive Q&A.
+A browser-based UI is included (`app.py`) with:
+- File upload (PDF, images)
+- URL ingestion
+- Interactive chat with source tracking
+- Database management (view count, clear)
+
+### Run locally
+
+```bash
+streamlit run app.py
+```
+
+### Sample documents
+
+Place your PDFs, images, or text files in `documents/`. On first startup, the app auto-ingests all files into ChromaDB.
+
+## Deployment
+
+Share this project on your resume with a public URL. Two free options:
+
+### Option 1: Streamlit Community Cloud (Recommended)
+
+1. **Push to GitHub** (if not already):
+   ```bash
+   git add -A
+   git commit -m "Ready for deployment"
+   git push
+   ```
+
+2. **Go to** https://share.streamlit.io and sign in with GitHub
+
+3. Click **"Create app"** → **"From existing repo"**
+
+4. Select your repo, branch, and set **Main file path** to `app.py`
+
+5. **Add secrets** (click **"Advanced settings"** → **"Secrets"**):
+   ```toml
+   GROQ_API_KEY = "gsk_your_key_here"
+   ```
+
+6. Click **Deploy** — your app will be live at:
+   ```
+   https://your-app-name.streamlit.app
+   ```
+
+> **Note:** First deploy takes 3-5 minutes. The embedding model (~90MB) and ChromaDB are set up automatically.
+
+### Option 2: Hugging Face Spaces
+
+1. **Push to GitHub** (same as above)
+
+2. Go to https://huggingface.co/new-space
+
+3. Set:
+   - **Space name**: `rag-document-qa`
+   - **License**: MIT
+   - **Space SDK**: **Streamlit**
+
+4. In the **Files** tab, upload your repo (or connect GitHub)
+
+5. Go to **Settings** → **Repository Secrets** → add:
+   ```
+   GROQ_API_KEY = gsk_your_key_here
+   ```
+
+6. Your space will build and deploy at:
+   ```
+   https://huggingface.co/spaces/your-username/rag-document-qa
+   ```
+
+### What auto-ingest does
+
+On each cold start, the app automatically ingests all files from `documents/` into ChromaDB. This works because:
+- Cloud deployments have ephemeral storage — ChromaDB resets on restart
+- Sample documents are tracked in git and included in the deploy
+- The app detects an empty database and runs `ingest_all()` on first load
+
+### Resume tip
+
+Put this on your resume as:
+> **RAG Document Q&A** — `share.streamlit.io/your-username/repo-name`
+> *Built a multi-source RAG engine ingesting PDFs, images, and URLs with vector search (ChromaDB + sentence-transformers) and Groq LLMs for grounded Q&A. Deployed on Streamlit Cloud.*
