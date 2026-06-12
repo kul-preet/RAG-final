@@ -2,4 +2,12 @@
 venv/
 __pycache__/
 *.pyc
+*.pyo
 chroma_db/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.egg-info/
+dist/
+build/

@@ -1,0 +1,15 @@
+RAG (Retrieval-Augmented Generation) is a technique that combines information retrieval with text generation. Instead of relying solely on the knowledge stored in a large language model's parameters, RAG first retrieves relevant documents or passages from a knowledge base, then feeds them as context to the LLM to generate a grounded answer.
+
+Key benefits of RAG:
+1. Up-to-date information: The knowledge base can be refreshed without retraining the model
+2. Source attribution: Answers can be traced back to specific documents
+3. Reduced hallucination: The LLM generates answers based on retrieved evidence
+4. Domain customization: Any private documents can be used as the knowledge source
+
+Common use cases include customer support chatbots, legal document analysis, medical research assistants, and enterprise knowledge management systems.
+
+The typical RAG pipeline consists of:
+- Ingestion: Documents are parsed, chunked, and embedded into vectors
+- Storage: Vectors are stored in a vector database like ChromaDB
+- Retrieval: User queries are embedded and searched against the vector store
+- Generation: Retrieved chunks are passed as context to an LLM which generates the final answer

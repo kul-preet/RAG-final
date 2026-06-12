@@ -86,13 +86,19 @@ def save_documents(documents):
 #step 3 :- search 
 #search for text in db
 def search(query, top_k = config.TOP_K):
+    if collection.count() == 0:
+        return []
+    
     #embed the question
     query_vector = embed_text(query)
+    
+    # ensure we ask for at least 1 result
+    n_results = max(min(top_k, collection.count()), 1)
     
     results = collection.query(
     #checking for the close matches in chromadb
     query_embeddings=[query_vector], #wrapped in a list for multiple batches
-    n_results=min(top_k, collection.count()),  #min prevents for asking more results than existing
+    n_results=n_results,
     include=["documents", "metadatas", "distances"]
     )
     
